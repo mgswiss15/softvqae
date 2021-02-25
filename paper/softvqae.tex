@@ -170,7 +170,7 @@ we use the differentiable soft relaxation
 \hat{p}_c(\rvc^{(i)} = j) = \softmax(-\sigma \Vert \vz^{(i)} - \ve^{(j)} \Vert) = \frac{\exp(-\sigma \Vert \vz^{(i)} - \ve^{(j)} \Vert)}{\sum_j^k \exp(-\sigma \Vert \vz^{(i)} - \ve^{(j)} \Vert)} \enspace .
 \end{align}
 
-Our final objective is the minimization of the empirical loss composed of three terms: the distortion, the soft cross-entropy and the (hard) cross -entropy divergence
+Our final objective is the minimization of the empirical loss composed of three terms: the distortion, the soft cross-entropy, and the (hard) cross-entropy
 \begin{align}\label{eq:loss_final}
 \Lsh(\theta, \mE, \phi, \psi) := \frac{1}{n}\sum_i^n d(\vx_i, \vxh_i) + \alpha \, s(\vc_i) + \beta \, h(\vc_i) \enspace .
 \end{align}
@@ -224,7 +224,7 @@ We next confirm the effectiveness of the soft cross-entropy term $s(\vc)$ in our
 Increasing the $\alpha$ hyper-parameter should put more importance on the rate minimization (through the entropy) as compared to the distortion.
 In the right plot of figure \ref{fig:plots} we compare the points $k=[8, 32, 128]$ of the \emph{`vq, 8'} curve for values $\alpha = [0.01, 0.001, 0]$ from left to right.
 With the highest $\alpha = 0.01$, the objective trade-off searches for the lowest rate tolerating higher distortion. The lower the $\alpha$, the less we push for low rates which allows for smaller distortion. 
-This behaviour corresponds well to the expected and desirable one where, as formulated in \eqref{eq:trade_off}, we can now directly control the trade-off between between the two competing objectives by setting the hyper-parameter $\alpha$.
+This behaviour corresponds well to the expected and desirable one where, as formulated in \eqref{eq:trade_off}, we can now directly control the trade-off between the two competing objectives by setting the hyper-parameter $\alpha$.
 
 Examples comparing the original with the reconstructed images for the \emph{`vq, 8'} are available in the repo in the \href{https://bitbucket.org/dmmlgeneva/softvqae/src/master/paper/pics}{paper/pics} folder.
 In the same place, there are examples of the learned $\qc$ histograms for \emph{`vq, 8, k=32'} with different values of $\alpha$ showing the concentration of the measure into a few points in the support for high $\alpha$.
