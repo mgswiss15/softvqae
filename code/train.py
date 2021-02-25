@@ -1,8 +1,3 @@
-"""
-
-Use configparser for donfiguration: https://hackersandslackers.com/simplify-your-python-projects-configuration/
-"""
-
 import torch.optim as optim
 import helpers as helpers
 from softae import SoftAe, SoftVqAe

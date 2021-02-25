@@ -10,7 +10,7 @@ AeOutput = namedtuple('AeOuput', ['zbar', 'zhard', 'symbols', 'z', 'xhat'])
 QuantizerOutput = namedtuple('QuantizerOutput', ['zbar', 'zsoft', 'zhard', 'symbols'])
 
 
-# Normalization not necessary - ImageNet32 is already normalized to [0, 1]
+# Normalization not necessary - ImageNet32 and CIFAR10 is already normalized to [0, 1]
 
 # def _get_mean_std(device):
 #     """Use pre-calculated mean and std values to normalize the data."""

@@ -12,7 +12,7 @@ pip install matlab
 
 ## Run
 
-To run locally, edit the configuration file (e.g. `./configs/ae_run.ini`) or other and provide it command line call.
+To run locally, edit the configuration file (e.g. `./configs/ae_run.ini`) or other and provide it at command line call.
 Default configs are in `./configs/ae.ini` **you should not touch this**.
 They are always read first and overwritten by whatever configs you provide in the `--config` file. 
 

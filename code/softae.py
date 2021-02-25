@@ -1,4 +1,4 @@
-"""My new model: Autoencoder with soft symbols."""
+"""SoftVqAe models."""
 
 from autoencoder import CompAe, Quantizer, Histogram
 from collections import namedtuple
