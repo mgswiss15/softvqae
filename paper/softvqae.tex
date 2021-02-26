@@ -65,7 +65,7 @@ Carouge, Swizerland \\
 
 \begin{abstract}
 We consider the problem of learned transform compression where we learn both, the transform as well as the probability distribution over the discrete codes.
-We utilize a soft relaxation of the quantization operation to allow for back-propagation of gradients and employ vector (rahter than scalar) quantization of the latent codes.
+We utilize a soft relaxation of the quantization operation to allow for back-propagation of gradients and employ vector (rather than scalar) quantization of the latent codes.
 Furthermore, we apply similar relaxation in the code probability assignments enabling direct optimization of the code entropy.
 To the best of our knowledge, this approach is completely novel.
 We conduct a set of proof-of concept experiments confirming the potency of our approaches.
@@ -75,7 +75,7 @@ We conduct a set of proof-of concept experiments confirming the potency of our a
 
 We consider the problem of compressing data $\vx \in \sX$ sampled i.i.d. according to some unknown probability measure (distribution) $\vx \sim \mux$.
 %\footnote{For the sake of generality, we do not take any assumptions about the probability space being discrete or continuous.}.
-We take the standard transform coding \citep{sayoodIntroductionDataCompression2012} approach where we first transform the data $\vc$ by a learned non-linear function, an encoder $\gEt : \sX \to \sZ$, into some latent representation $\vz \in \sZ$.
+We take the standard transform coding \citep{sayoodIntroductionDataCompression2012} approach where we first transform the data $\vx$ by a learned non-linear function, an encoder $\gEt : \sX \to \sZ$, into some latent representation $\vz \in \sZ$.
 We then quantize the transformed data $\vz = \gEt(\vx)$ using a quantization function $\gQE : \sZ \to \sC$ parametrized by learned embeddings $\mE$ (codebook/ dictionary) so that the discrete codes composed of indexes of the embedding vectors $\vc = \gQE(\vz)$ can be compressed by a lossless entropy encoding and transmitted.
 The received and losslessly decoded integer codes are then used to index the embedding vectors and dequantized back to the latent space $\overline{\gQE} : \sC \to \widehat{\sZ} \subset \sZ$ introducing a distortion due to mapping the codes only to the discrete subset $\widehat{\sZ} \subset \sZ$ corresponding to the quantization embeddings.
 The dequantized data $\vzh = \overline{\gQE}(\vc)$ are then decoded by a learned non-linear decoder $\gDp : \widehat{\sZ} \to \sX$ to obtain the reconstructions $\vxh = \gDp(\vzh)$.
@@ -117,7 +117,7 @@ where instead of the hard encoding $\hat{\vzb}^{(i)}$ picking the single nearest
 The distortion loss is thus formulated as $d(\vx, \vxh) = d(\vx, \gDp[\mathrm{sg}(\vzh - \vzt) + \vzt])$, where $\mathrm{sg}$ is the stopgradient operator. 
 
 The hard/soft strategy is different from the approach of \citet{oordNeuralDiscreteRepresentation2017} where they use a form of straight-through gradient estimator and dedicated codebook and commitment terms in the loss to train the embeddings $\mE$.
-This is also differenet from \citet{williamsHierarchicalQuantizedAutoencoders2020}, where they use the relaxed formulation of \eqref{eq:soft_quantization} for both forward and backward passes in a fully stochastic quantization scheme aimed at preventing the mode-dropping effect of a deterministic approximate posterior in a hierarchical vector-quantized VAE.
+This is also different from \citet{williamsHierarchicalQuantizedAutoencoders2020}, where they use the relaxed formulation of \eqref{eq:soft_quantization} for both forward and backward passes in a fully stochastic quantization scheme aimed at preventing the mode-dropping effect of a deterministic approximate posterior in a hierarchical vector-quantized VAE.
 
 
 \section{Minimizing the code cross-entropy}
@@ -143,11 +143,11 @@ Similar strategy has been used for example in \citet{theisLossyImageCompression2
 
 There is one caveat to the above approach.
 In the minimization in \eqref{eq:empirical_crossentropy} the sampling  distribution $\mu_c$ is treated as fixed.
-Minimizing the cross-entropy in such a regime minimizes the $\KL$ and hence the additional bits due to $\qc \neq \pc$ but not the entropy $\Hc(\rvc)$ (see \eqref{eq:crossentropy_KL}) which is treated as fixed and therefore not optimized for low rate as explained in section \ref{sec:Intro}
+Minimizing the cross-entropy in such a regime minimizes the $\KL$ and hence the additional bits due to $\qc \neq \pc$ but not the entropy $\Hc(\rvc)$ (see \eqref{eq:crossentropy_KL}) which is treated as fixed and therefore not optimized for low rate as explained in section \ref{sec:quantization}.
 
 This may seem natural and even inevitable since the samples $\vc$ are the result of sampling the data $\vx$ from the unknown yet fixed distribution $\mu_x$.
 Yet, \textbf{the distribution $\mu_c$ is not fixed}.
-It is determined by the learned transformation $\gTEt = \gQE \circ \gEt, \ \rvc$ as the push-forward measure of $\mu_x$
+It is determined by the learned transformation $\gTEt = \gQE \circ \gEt$ as the push-forward measure of $\mu_x$
 \begin{align}
 \mu_c[\rvc \in \mA] = \mu_c[\gTEt(\rvx) \in \mA] = \mu_x[\rvx \in \gTEt^{-1}(\mA)] \enspace ,
 \end{align}
@@ -170,14 +170,14 @@ we use the differentiable soft relaxation
 \hat{p}_c(\rvc^{(i)} = j) = \softmax(-\sigma \Vert \vz^{(i)} - \ve^{(j)} \Vert) = \frac{\exp(-\sigma \Vert \vz^{(i)} - \ve^{(j)} \Vert)}{\sum_j^k \exp(-\sigma \Vert \vz^{(i)} - \ve^{(j)} \Vert)} \enspace .
 \end{align}
 
-Our final objective is the minimization of the empirical loss composed of three terms: the distortion, the soft cross-entropy, and the (hard) cross-entropy
+Our final objective is the minimization of the empirical loss composed of three terms: the distortion, the \emph{soft} cross-entropy, and the \emph{hard} cross-entropy
 \begin{align}\label{eq:loss_final}
 \Lsh(\theta, \mE, \phi, \psi) := \frac{1}{n}\sum_i^n d(\vx_i, \vxh_i) + \alpha \, s(\vc_i) + \beta \, h(\vc_i) \enspace .
 \end{align}
 The distortion may be the squared error $d(\vx, \vxh) = \Vert \vx - \vxh \Vert^2$ or other application-dependent metric (e.g. multi-scale structural similarity index for visual perception in images).
 Through the distortion we optimize the parameters of the decoder $\gDp$ and using the relaxation described in section \ref{sec:quantization} for the backward pass also the parameters of the encoder $\gEt$ and the quantization embeddings $\gQE$.
 
-The hard cross-entropy loss is
+The \emph{hard} cross-entropy loss is
 \begin{align}
 h(\vc) = - \frac{m}{d} \sum_j^{d/m} \sum_{\vc^{(j)} = 1}^k \pc(\vc^{(j)}) \log \qc(\vc^{(j)})
 = - \frac{m}{d} \sum_j^{d/m} \log \qc(\vc^{(j)}) \enspace ,
@@ -186,7 +186,7 @@ where we treat the dimensions of the vector $\vc = [\vc^{(1)}, \ldots, \vc^{(d/m
 The loss simplifies to the final form due to the 0/1 probabilities of the deterministic code-assignments in \eqref{eq:hardprobs}.
 Through the hard cross-entropy loss we learn the parameters of the probability model $\gPp$ outputting the $\qc$ distribution.
 
-The soft cross-entropy loss is
+The \emph{soft} cross-entropy loss is
 \begin{align}
 s(\vc) = - \frac{m}{d} \sum_j^{d/m} \sum_{\vc^{(j)} = 1}^k \hat{p}_c(\vc^{(j)}) \log \textrm{sg}[\qc(\vc^{(j)})] \enspace ,
 \end{align}
@@ -198,10 +198,11 @@ We use the $sg$ operator here to treat $\qc$ as fixed in this part of the loss p
 \section{Experiments}
 
 As a proof of concept we conducted a set of experiments on the tiny 32x32 CIFAR-10 images \citep{krizhevskyLearningMultipleLayers2009}.
-We use similar architecture of the encoder $\gEt$ and decoder $\gDp$ as \citet{mentzerConditionalProbabilityModels2018} (without the spatial importance mapping), with the downsumpling and upsampling stride-2 convolutions with kernels of size 4, and 10 residual blocks with skip connections between every 3.
+We use similar architecture of the encoder $\gEt$ and decoder $\gDp$ as \citet{mentzerConditionalProbabilityModels2018} (without the spatial importance mapping), with the downsampling and upsampling stride-2 convolutions with kernels of size 4, and 10 residual blocks with skip connections between every 3.
 We fix the annealing parameter $\sigma=1$ and the loss hyper-parameter $\beta=1$\footnote{In our preliminary experiments the results were not very sensitive to $\beta$. In fact, $\beta$ influences only the speed with which the probability model $\gPp$ is trained compared to the other components of the model updated through the other parts of the loss.}.
 We use ADAM with default pytorch parameters, one cycle cosine learning rate and train for 15 epochs.
-The code is available at: \url{https://bitbucket.org/dmmlgeneva/softvqae/}.
+The code is available at: \url{masked_for_anonymous_review}
+%\url{https://bitbucket.org/dmmlgeneva/softvqae/}.
 
 We first compare the vector quantization (VQ) approach where the codebook is composed of $m$-long vectors versus the scalar (SQ) approach where it contains scalars $m=1$ as e.g. in \cite{mentzerConditionalProbabilityModels2018}.
 By construction the VQ version needs to transmit shorter messages for the same level of downsampling. For example, with 8-fold downsampling to $4 \times 4$ latents $\vz$ with 8 channels the discrete codes $\vc$ of SQ have $d/m = 128$ elements.
@@ -226,8 +227,9 @@ In the right plot of figure \ref{fig:plots} we compare the points $k=[8, 32, 128
 With the highest $\alpha = 0.01$, the objective trade-off searches for the lowest rate tolerating higher distortion. The lower the $\alpha$, the less we push for low rates which allows for smaller distortion. 
 This behaviour corresponds well to the expected and desirable one where, as formulated in \eqref{eq:trade_off}, we can now directly control the trade-off between the two competing objectives by setting the hyper-parameter $\alpha$.
 
-Examples comparing the original with the reconstructed images for the \emph{`vq, 8'} are available in the repo in the \href{https://bitbucket.org/dmmlgeneva/softvqae/src/master/paper/pics}{paper/pics} folder.
-In the same place, there are examples of the learned $\qc$ histograms for \emph{`vq, 8, k=32'} with different values of $\alpha$ showing the concentration of the measure into a few points in the support for high $\alpha$.
+In the appendix we provide examples of the learned $\qc$ histograms for \emph{`vq, 8, k=32'} with different values of $\alpha$ showing the concentration of the measure into a few points in the support for high $\alpha$.
+Examples comparing the original with the reconstructed images for the \emph{`vq, 8'} are available in \url{masked_for_anonymous_review}.
+%the repo in the \href{https://bitbucket.org/dmmlgeneva/softvqae/src/master/paper/pics}{paper/pics} folder.
 
 
 % \subsubsection*{Acknowledgments}
@@ -238,8 +240,29 @@ In the same place, there are examples of the learned $\qc$ histograms for \emph{
 \bibliography{softvqae}
 \bibliographystyle{iclr2021_conference}
 
-% \appendix
-% \section{Appendix}
-% You may include other additional sections here.
+\appendix
+\section{Appendix}
+
+Histograms $\qc$ learned by the probability model $\gPp$ for the \emph{`vq, 8'} models with the number of embedding vectors $k=32$ $\approx$ the red line in the right graph in Figure \ref{fig:plots} with increasing $\alpha \in \{0, 0.001, 0.01\}$.
+For the highest $\alpha = 0.01$ the distribution is concentrated into a few points in the support resulting in the lowest entropy (and therefore the best rate) but highest distortion.
+
+\begin{figure}[h]
+\begin{center}
+\includegraphics[scale=0.5]{pics/hist_vq8_k32_alpha0.png}
+\end{center}
+\caption{Learned historgram $\qc$ for $\alpha = 0$}
+\end{figure}
+\begin{figure}[h]
+\begin{center}
+\includegraphics[scale=0.5]{pics/hist_vq8_k32_alpha0_001.png}
+\end{center}
+\caption{Learned historgram $\qc$ for $\alpha = 0.001$}
+\end{figure}
+\begin{figure}[h]
+\begin{center}
+\includegraphics[scale=0.5]{pics/hist_vq8_k32_alpha0_01.png}
+\end{center}
+\caption{Learned historgram $\qc$ for $\alpha = 0.01$}
+\end{figure}
 
 \end{document}
