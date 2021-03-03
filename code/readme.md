@@ -7,7 +7,7 @@ conda create --name compr
 conda activate compr
 conda install pytorch torchvision torchaudio cudatoolkit=11.0 -c pytorch
 pip install wandb
-pip install matlab
+pip install matplotlib
 ```
 
 ## Run
