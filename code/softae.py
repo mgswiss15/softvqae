@@ -31,7 +31,7 @@ class SoftAe(CompAe):
         zbar, zhard, symbols, softsymbols, z, xhat = inputs
         crossH = self.emodel.loss_func(symbols)
         mse = F.mse_loss(x, xhat)
-        softcrossH = self.emodel.soft_loss_func(softsymbols)
+        softcrossH = torch.zeros_like(mse) if (self.config.alpha == 0) else self.emodel.soft_loss_func(softsymbols)
         total = mse + alpha * softcrossH + beta * crossH
         return {'crossH': crossH, 'softcrossH': softcrossH, 'mse': mse, 'total': total}
 
