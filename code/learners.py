@@ -29,7 +29,7 @@ class Learner():
     def fit(self, epochs):
         self.epochs = epochs
         self.callback('fit_begin')
-        self.eval_epoch()
+        # self.eval_epoch()
         for self.epoch in range(epochs):
             self.callback('epoch_begin')
             self.train_epoch()
@@ -39,7 +39,7 @@ class Learner():
 
     def train_epoch(self):
         self.model.train()
-        for batch in self.train_loader:  # batch is tuple with normalized and non-normalized data
+        for batch in self.train_loader:  # batch is tuple with data and labels
             self.callback('trainbatch_begin')
             batch = batch[0].to(self.device)
             self.optimizer.zero_grad()
@@ -67,7 +67,7 @@ class Learner():
         n_samples = 0.
         self.model.eval()
         with torch.no_grad():
-            for batch in self.test_loader:  # batch is tuple with normalized and non-normalized data
+            for batch in self.test_loader:  # batch is tuple with data and labels
                 batch = batch[0].to(self.device)
                 batch_size = batch.shape[0]
                 out = self.model(batch)

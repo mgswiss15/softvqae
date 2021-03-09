@@ -10,6 +10,19 @@ import argparse
 
 
 def train(config):
+    train_loader, test_loader = get_dataloaders(config)
+    model_class = SoftAe if config.novq else SoftVqAe
+    model = model_class(config).to(config.device)
+    optimizer = optim.Adam(model.parameters(), lr=config.learn_rate)
+    callbacks = [cb.Wandb(), cb.Printouts(), cb.Evaluate(), cb.Scheduler(), cb.SaveModel()]
+    learner = Learner(model, optimizer, train_loader, test_loader, config.device, callbacks)
+    project_name = "SoftAe" if config.novq else "SoftVqAe"
+    helpers.wandb_init(project_name, config)
+    learner.fit(config.epochs)
+    return model, test_loader
+
+
+def get_dataloaders(config):
     if "cifar" in config.traindir:
         if "small" in config.traindir:
             trainset = helpers.CifarSmall(config.traindir, train=True, transform=transforms.ToTensor())
@@ -22,15 +35,7 @@ def train(config):
         testset = datasets.ImageFolder(config.testdir, transform=transforms.ToTensor())
     train_loader = data.DataLoader(trainset, batch_size=config.bsize, shuffle=True)
     test_loader = data.DataLoader(testset, batch_size=config.bsize, shuffle=True)
-    model_class = SoftAe if config.novq else SoftVqAe
-    model = model_class(config).to(config.device)
-    optimizer = optim.Adam(model.parameters(), lr=config.learn_rate)
-    callbacks = [cb.Wandb(), cb.Printouts(), cb.Evaluate(), cb.Scheduler(), cb.SaveModel()]
-    learner = Learner(model, optimizer, train_loader, test_loader, config.device, callbacks)
-    project_name = "SoftAe" if config.novq else "SoftVqAe"
-    helpers.wandb_init(project_name, config)
-    learner.fit(config.epochs)
-    return model, test_loader
+    return train_loader, test_loader
 
 
 def get_ae_config(cfile):
