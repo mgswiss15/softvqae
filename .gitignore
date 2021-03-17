@@ -21,6 +21,8 @@ wandb/
 *.run.xml
 *.synctex.gz
 *.toc
+*.nav
+*.snm
 
 # Sublime project files
 *.sublime*
