@@ -41,8 +41,8 @@
 % Non-anonymous submissions will be rejected without review.
 
 \author{Magda Gregorová \& Marc Desaules \& Alexandros Kalousis \\
-Geneva School of Business Administration, HES-SO \\
-Carouge, Swizerland \\
+Geneva School of Business Administration, \\
+HES-SO University of Applied Sciences of Western Switzerland \\
 \texttt{\{name.surname\}@hesge.ch} \\
 }
 
@@ -57,7 +57,7 @@ Carouge, Swizerland \\
 \newcommand{\fix}{\marginpar{FIX}}
 \newcommand{\new}{\marginpar{NEW}}
 
-% \iclrfinalcopy % Uncomment for camera-ready version, but NOT for submission.
+\iclrfinalcopy % Uncomment for camera-ready version, but NOT for submission.
 \begin{document}
 
 
@@ -201,8 +201,9 @@ As a proof of concept we conducted a set of experiments on the tiny 32x32 CIFAR-
 We use similar architecture of the encoder $\gEt$ and decoder $\gDp$ as \citet{mentzerConditionalProbabilityModels2018} (without the spatial importance mapping), with the downsampling and upsampling stride-2 convolutions with kernels of size 4, and 10 residual blocks with skip connections between every 3.
 We fix the annealing parameter $\sigma=1$ and the loss hyper-parameter $\beta=1$\footnote{In our preliminary experiments the results were not very sensitive to $\beta$. In fact, $\beta$ influences only the speed with which the probability model $\gPp$ is trained compared to the other components of the model updated through the other parts of the loss.}.
 We use ADAM with default pytorch parameters, one cycle cosine learning rate and train for 15 epochs.
-The code is available at: \url{masked_for_anonymous_review}
-%\url{https://bitbucket.org/dmmlgeneva/softvqae/}.
+The code is available at:
+ % \url{masked_for_anonymous_review}
+\url{https://bitbucket.org/dmmlgeneva/softvqae/}.
 
 We first compare the vector quantization (VQ) approach where the codebook is composed of $m$-long vectors versus the scalar (SQ) approach where it contains scalars $m=1$ as e.g. in \cite{mentzerConditionalProbabilityModels2018}.
 By construction the VQ version needs to transmit shorter messages for the same level of downsampling. For example, with 8-fold downsampling to $4 \times 4$ latents $\vz$ with 8 channels the discrete codes $\vc$ of SQ have $d/m = 128$ elements.
@@ -228,8 +229,8 @@ With the highest $\alpha = 0.01$, the objective trade-off searches for the lowes
 This behaviour corresponds well to the expected and desirable one where, as formulated in \eqref{eq:trade_off}, we can now directly control the trade-off between the two competing objectives by setting the hyper-parameter $\alpha$.
 
 In the appendix we provide examples of the learned $\qc$ histograms for \emph{`vq, 8, k=32'} with different values of $\alpha$ showing the concentration of the measure into a few points in the support for high $\alpha$.
-Examples comparing the original with the reconstructed images for the \emph{`vq, 8'} are available in \url{masked_for_anonymous_review}.
-%the repo in the \href{https://bitbucket.org/dmmlgeneva/softvqae/src/master/paper/pics}{paper/pics} folder.
+Examples comparing the original with the reconstructed images for the \emph{`vq, 8'} are available in % \url{masked_for_anonymous_review}.
+the repo in the \href{https://bitbucket.org/dmmlgeneva/softvqae/src/master/paper/pics}{paper/pics} folder.
 
 
 % \subsubsection*{Acknowledgments}
