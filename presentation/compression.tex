@@ -7,6 +7,8 @@
 % \usepackage{kpfonts}
 \usefonttheme{serif}
 
+\setbeamercolor{alerted text}{fg=black!40!red}
+
 % Modifty the templates for title, headline and footline
 \setbeamertemplate{headline}
 {%
@@ -25,7 +27,7 @@
   \leavevmode%
   \hbox{%
   \begin{beamercolorbox}[wd=.5\paperwidth,ht=2.25ex,dp=1ex,leftskip=0.3cm]{author in head/foot}%
-    \usebeamerfont{date in head/foot}Magda Gregorov\'a, 26/3/2021, W\"urzburg, Germany
+    \usebeamerfont{date in head/foot}Magda Gregorov\'a, DMML workshop 6/7/2021, Geneva
   \end{beamercolorbox}%
   \begin{beamercolorbox}[wd=.5\paperwidth,ht=2.25ex,dp=1ex,rightskip=0.3cm]{title in head/foot}%
     \usebeamerfont{title in head/foot}\hfill \insertframenumber{} / \inserttotalframenumber 
@@ -200,7 +202,7 @@
 {\large Magda Gregorov\'a}
 
 \vspace{1em}
-26 March 2021, W\"urzburg, Germany
+DMML workshop 6 July 2021, Geneva
 
 \vspace{2em}
 {\small\textit{In collaboration with:\\
@@ -245,9 +247,17 @@ Marc Desaules \& Alexandros Kalousis}}
 \node[inner sep=0pt] (embed) at (10.5, 2.1) {$\mE$ - codebook};
 
 \node[inner sep=0pt] (quant) at (10.5, 5.8) {$\gQE$};
+\node[inner sep=0pt] (quantt) at (10.5, 6.25) {quantizer};
 \node[inner sep=0pt] (enc) at (2.8, 7.2) {$\gEt$};
+\node[inner sep=0pt] (enct) at (2.8, 7.75) {encoder};
 \node[inner sep=0pt] (dec) at (2.8, 0.2) {$\gDp$};
+\node[inner sep=0pt] (enct) at (2.8, 0.8) {decoder};
 \node[inner sep=0pt] (dquant) at (10.5, 0.7) {$\overline{\gQE}$};
+
+\node[inner sep=0pt] (sender) at (0, 4) {sender};
+\node[inner sep=0pt] (sender) at (0, 3) {reciever};
+\draw[color = black, thick, dashed] (-1,3.5) to ++(9, 0);
+\draw[color = black, thick, dashed] (12.7,3.5) to ++(1.6, 0);
 
 \tikzcuboid{%
 shiftx=5.3cm,%
@@ -319,7 +329,7 @@ top/.style={draw=blue!20!white,fill=blue!70!green!20!white},%
 \draw[color = black, thick, dotted, <-] (15.2,2.05) to ++(1.2, 0.7);
 
 %example of vq
-\onslide<2->{%
+% \onslide<2->{%
 \fill[fill=blue!60!green, draw=blue!60!green] (14,6.8) rectangle ++(0.2,0.2);
 \node[yellow, scale=.6, inner sep=0pt] (embed) at (14.1, 6.9) {7};
 \node[blue!60!green, inner sep=0pt] (c) at (14.3, 7.3) {$c^{(4)}$};
@@ -339,17 +349,17 @@ top/.style={draw=blue!20!white,fill=blue!70!green!20!white},%
 \draw[fill=blue!60!green, draw=blue!60!green] (5.2,0.7) -- (6,1.5) -- (6.2,1.5) -- (5.4,0.7) -- cycle;
 \node[blue!60!green, inner sep=0pt] (z4) at (6.3, 1.8) {$\hat{z}^{(4)}$};
 
-\node[inner sep=0pt] (quant) at (10.5, 6.5) {$\Vert z^{(i)} - e^{(j)}\Vert$};
-}
+\node[inner sep=0pt] (quant) at (10.5, 6.8) {$\Vert z^{(i)} - e^{(j)}\Vert$};
+% }
 
-\onslide<3->{%
-\fill[red!50!green, fill opacity=0.1, rounded corners=10pt] (13,-0.7) rectangle ++(5.3,9.3);
+% \onslide<3->{%
+\fill[blue!70!green, fill opacity=0.1, rounded corners=10pt] (13,-0.7) rectangle ++(5.3,9.3);
 \node[inner sep=0pt] (lossless) at (15.7, 8.3) {Lossless entropy};
 \node[inner sep=0pt] (lossless2) at (15.7, 7.8) {encoding};
 
-\fill[red!20!blue, fill opacity=0.1, rounded corners=10pt] (-1.4,-2) rectangle ++(14,11.4);
+\fill[black!50!red, fill opacity=0.1, rounded corners=10pt] (-1.4,-2) rectangle ++(14,11.4);
 \node[inner sep=0pt] (embed) at (6, 8.9) {Learned lossy transform coding};
-}
+% }
 
 
 % \draw[fill=red!80!yellow] (7,6) -- (12,6) -- (10,4) -- (5,4) -- cycle;
@@ -362,7 +372,7 @@ top/.style={draw=blue!20!white,fill=blue!70!green!20!white},%
 
 \end{frame}
 
-%%%%%%%%%%%%% Cross-entropy %%%%%%%%%%%%%%%
+%%%%%%%%%%%%% End-to-end optimized compression %%%%%%%%%%%%%%%
 
 \begin{frame}[t]
 
@@ -372,43 +382,70 @@ top/.style={draw=blue!20!white,fill=blue!70!green!20!white},%
 
 \begin{columns}[c]
 \column{0.4\textwidth}
-\includegraphics[width=\textwidth]{Pics/transform_coding_half.png}
+\includegraphics[width=\textwidth]{Pics/transform_coding.png}
 
 \column{0.45\textwidth}
 
 \begin{tikzpicture}
-\node[inner sep=0pt] (eq) at (0, 1) {$\gEt, \gDp, \gQE$};
+\node[inner sep=0pt] (eq) at (-0.5, 1) {Learn $\gEt, \gDp, \gQE$ by minimizing};
 \node[inner sep=0pt] (eq) at (0, 0) {$
-\Ls := \underbrace{\E_{\mux} d(\rvx, \hat{\rvx})}_{distortion} \ + \ \reg \underbrace{\E_{\muc} l(\rvc)}_{rate}$};
-
-\fill[red!20!blue, fill opacity=0.1, rounded corners=5pt] (-1.45,-0.5) rectangle ++(1.7,1.1);
-\fill[red!50!green, fill opacity=0.1, rounded corners=5pt] (0.7,-0.5) rectangle ++(1.6,1.1);
+\Ls := \underbrace{\E_{\mux} d(\rvx, \hat{\rvx})}_{distortion} \ + \ \reg \underbrace{\E_{\muc} l(\rvc)}_{rate} \quad $ {\scriptsize(trade-off)}};
+\node[inner sep=0pt] (eq) at (-1.6, -0.8) {\scriptsize data $\rvx \sim \mux$};
+\node[inner sep=0pt] (eq) at (0.55, -0.8) {\scriptsize symbols $\rvc \sim \muc$};
+\node[inner sep=0pt] (eq) at (-0.45, -1.1) {\scriptsize (unknown probability measures)};
+ 
+\fill[blue!30!white, fill opacity=0.2, rounded corners=5pt] (-2.35,-0.5) rectangle ++(1.7,1.1);
+\fill[blue!60!white, fill opacity=0.2, rounded corners=5pt] (-0.2,-0.5) rectangle ++(1.6,1.1);
 \end{tikzpicture}
 
 \column{0.05\textwidth}
 \
 \end{columns}
 
+% \vskip 0.5cm
+
+\begin{columns}[c]
+\column{0.5\textwidth}
+\center
+{\scriptsize \textit{\structure{reconstruction error:}}
+\vskip 0.1cm
+
+$d(\rvx, \hat{\rvx}) = \Vert \rvx - \hat{\rvx}\Vert_2^2$
+\\ 
+(or $\ell_1$, MS-SSIM, \ldots)}
+\column{0.5\textwidth}
+\center
+{\scriptsize \textit{\structure{length of binary encoding:}}
+\vskip 0.1cm
+
+$l(c) = - \log p_c(c) \quad$ (Shannon)
+\\ pmf: $\int_A \pc \dd \# = \sum_{\va \in \mA} \pc(\va) = \muc(\mA)$}
+\end{columns}
+
 \vskip 0.5cm
 
-\onslide<2->
-{%
-Shannon: $l^{*}(c) = - \log p_c(c)$ $\ \Longrightarrow \ \E_{\muc} l^{*}(c) = - \E_{\muc} \log p_c(\rvc) = \Hc(\rvc)$
-\[ \int_A \pc \dd \# = \sum_{\va \in \mA} \pc(\va) = \muc(\mA) \qquad \log p_c = \ ??? \quad \Hc(\rvc) = \ ???\]
-\[ \alert<3->{q_c} \approx p_c \quad  - \E_{\muc} \log q_c(\rvc) \approx - \E_{\muc} \log q_c(\rvc) \quad \cHc(\rvc) \approx \Hc(\rvc)\]
+\center
+{\scriptsize
+\structure{rate = entropy}: $\quad \E_{\muc} l(c) = - \E_{\muc} \log p_c(\rvc) = \Hc(\rvc)$ 
+
+\vskip 0.2cm
+
+\alert{unknown $p_c \Rightarrow$ cannot evaluate $\Hc(\rvc) \Rightarrow$ replace by estimate $q_c \approx p_c$}
+
+\vskip 0.1cm
+
+\structure{rate $\approx$ cross-entropy}: $\quad \E_{\muc} l(c) \approx - \E_{\muc} \log q_c(\rvc) = \cHc(\rvc)$ 
 }
 
-\onslide<3->
-{%
-\center
+\vskip 0.5cm
+
 \begin{tikzpicture}
 \node[inner sep=0pt] (eq) at (0, 0) {$\gEt, \gDp, \gQE, \alert{\gPp} \qquad
 \Ls := \underbrace{\E_{\mux} d(\rvx, \hat{\rvx})}_{distortion} \ + \ \reg \underbrace{\alert{\cHc(\rvc)}}_{rate}$};
 
-\fill[red!20!blue, fill opacity=0.1, rounded corners=5pt] (-0.1,-0.5) rectangle ++(1.7,1.1);
-\fill[red!50!green, fill opacity=0.1, rounded corners=5pt] (2.05,-0.5) rectangle ++(1.8,1.1);
+\fill[blue!30!white, fill opacity=0.2, rounded corners=5pt] (-0.1,-0.5) rectangle ++(1.7,1.1);
+\fill[blue!60!white, fill opacity=0.2, rounded corners=5pt] (2.05,-0.5) rectangle ++(1.8,1.1);
 \end{tikzpicture}
-}
 
 
 \end{frame}
@@ -454,15 +491,15 @@ Scalar quantization
 \structure{\Large Model learning - problems}
 
 \begin{textblock*}{2.5cm}(10cm,0.2cm)
-\includegraphics[width=\textwidth]{Pics/training_half.png}
+\includegraphics[width=\textwidth]{Pics/training.png}
 \end{textblock*}
 
 \vskip 1cm
 
 
-\structure{Problem $\gQE$: quantization non-differentiable}
+\structure{1) Non-differentiability of quantization operation}
 
-\vskip 0.3cm
+\vskip 0.1cm
 
 \begin{tikzpicture}
 
@@ -474,9 +511,9 @@ Forward: \, $\quad \vx \xrightarrow[]{\ \gEt \ } \vz \xrightarrow[]{\ \gQE \ } \
 Backward: $\quad \vx \xleftarrow[]{\ \nabla_{\theta} \ } \nabla_{\vz} \xleftarrow[]{\ \nabla_{\mE} \ } \nabla_{\vzh} \xleftarrow[]{\ \nabla_{\phi} \ } \nabla_{\vxh} \xleftarrow[]{\quad \ } d(\vx, \vxh)$
 };
 
-\draw[color=red] (-1.8, -0.4) to ++(2.5, 0.7);
-\draw[color=red] (-1.8, 0.3) to ++(2.5, -0.7);
-\fill[red!70!blue, draw=red, fill opacity=0.2, rounded corners=10pt] (-2,-0.5) rectangle ++(2.9,0.9);
+\draw[color=red!40!black] (-1.8, -0.4) to ++(1.5, 0.7);
+\draw[color=red!40!black] (-1.8, 0.3) to ++(1.5, -0.7);
+\fill[red!50!black, draw=red!40!black, fill opacity=0.1, rounded corners=5pt] (-2,-0.5) rectangle ++(1.9,0.9);
 
 % \node[color=red, inner sep=0pt] at (-0.1, -0.7) {%
 % $\vzh^{(i)} = \argmin_{\ve^{(j)}} \Vert \vz^{(i)} - \ve^{(j)} \Vert$
@@ -489,32 +526,17 @@ Backward: $\quad \vx \xleftarrow[]{\ \nabla_{\theta} \ } \nabla_{\vz} \xleftarro
 
 \vskip 0.8cm
 
-\onslide<2->{%
-\structure{Problem $\Hc$: entropy not minimized}
+\structure{2) Cross-entropy minimization does not minimize rate}
 
-\begin{tikzpicture}
+\[ \cHc(\rvc) = - \E_{\muc} \log q_c(\rvc) = \overbrace{\KL(\pc \Vert \qc)}^{\geq 0} + \Hc(\rvc)\]
 
-\node[inner sep=0pt] at (0, 1) {%
-$q_c \approx p_c: \quad \cHc(\rvc) \geq \Hc(\rvc) \qquad \cHc(\rvc) = \overbrace{\KL(\pc \Vert \qc)}^{\geq 0} + \Hc(\rvc)$
-};
+\[\min_{q_c} \ \cHc(\rvc) \ \Leftrightarrow \ \min_{q_c} \ \KL(\pc \Vert \qc) \]
 
-\node[inner sep=0pt] at (0.45, 0) {%
-$\min_{q_c} \ \cHc(\rvc) \ \Leftrightarrow \ \min_{q_c} \ \KL(\pc \Vert \qc) + \Hc(\rvc)$
-};
 
-\draw[color=red] (3.2, -0.25) to ++(0.95, 0.5);
-\draw[color=red] (3.2, 0.25) to ++(0.95, -0.5);
-\fill[red!70!blue, draw=red, fill opacity=0.2, rounded corners=5pt] (3.1,-0.3) rectangle ++(1.15,0.6);
+\center 
+\alert{$\Hc(\rvc)$ not function of $q_c$ so not optimized $\Rightarrow$ rate not optimized}
 
-\node[color=red, inner sep=0pt] at (2.8, -0.7) {%
-$q_c \to p_c \quad p_c$ fixed
-};
-% \node[color=red, inner sep=0pt] at (3.6, -0.6) {%
-% fixed
-% };
 
-\end{tikzpicture}
-}
 
 
 \end{frame}
@@ -523,98 +545,89 @@ $q_c \to p_c \quad p_c$ fixed
 
 \begin{frame}[t]
 
-\structure{\Large Push-forward measure \& soft-quantization}
+\structure{\Large Solutions - i), ii), iii)}
 
-{\small
-\begin{textblock*}{10cm}(1.5cm,1.2cm)
-\[\mu_c[\rvc \in \mA] = \mu_c[\gTEt(\rvx) \in \mA] = \mu_x[\rvx \in \gTEt^{-1}(\mA)] \qquad \gTEt = \gQE \circ \gEt
-\]
-\center
-\vskip -0.2cm
-\begin{tikzpicture}
-\node[inner sep=0pt] at (0, 0) {%
-$\gQE, \gEt \to \muc \to \Hc$
-};
-\fill[red!70!blue, fill opacity=0.1, rounded corners=5pt] (-1.5,-0.3) rectangle ++(3,0.6);
-\end{tikzpicture}
-\end{textblock*}
-\begin{textblock*}{1cm}(1cm,1.3cm)
-\begin{flushleft}
-\structure{1)}
-\end{flushleft}
-\end{textblock*}
-}
+\vskip 0.8cm
 
-\only<2->{%
-\small
-\begin{textblock*}{11cm}(1cm,3.2cm)
+
+\structure{i) soft quantization for backward gradients}
+\vskip 0.3cm
+
+{\scriptsize
+\text{\alert{forward hard (non-differentiable):}}
 \[
-\pc(c = j) =
-\begin{cases}
-1 & \text{if} \ \vzh = \ve^{(j)} \\
+p_z(\vzh = \ve^{(j)} \vert \vx) = \begin{cases}
+1 & \text{if} \ \ve^{(j)} = \argmin_{\ve^{(i)} \in \mE} \Vert \vz(\vx) - \ve^{(i)}\Vert_2^2 \\
 0 & \text{otherwise}
 \end{cases}
-\qquad h_{ce} = - \frac{1}{n} \sum_i^n \log q_c(c_i), \quad c_i \sim \muc
 \]
-\end{textblock*}
-\begin{textblock*}{1cm}(1cm,3.2cm)
-\begin{flushleft}
-\structure{2)}
-\end{flushleft}
-\end{textblock*}
+\[\vzh(\vx) = \sum_{\ve^{(j)} \in \mE} p_z(\vzh = \ve^{(j)} | \vx) \, \ve^{(j)}\]
 
-\begin{textblock*}{11cm}(1cm,4cm)
-\[
-\hat{p}_c(c = j) = \frac{\exp(-\sigma \Vert \vz - \ve^{(j)} \Vert)}{\sum_j^k \exp(-\sigma \Vert \vz - \ve^{(j)} \Vert)}
-\qquad s_{ce} = - \frac{1}{n} \sum_{i,j}^{n,k} \hat{p}_c(c_i = j) \log \mathrm{sg}[q_c(j)]
+\text{\alert{backward soft (differentiable):}}
+\[\hat{p}_z(\vzh = \ve^{(j)} | \vx) = \frac{\exp(-\sigma \Vert \vz - \ve^{(j)} \Vert)}{\sum_i^k \exp(-\sigma \Vert \vz - \ve^{(i)} \Vert)}
 \]
-\end{textblock*}
-\begin{textblock*}{1cm}(1.1cm,4.6cm)
-\begin{tikzpicture}
-\fill[red!70!blue, fill opacity=0.1, rounded corners=3pt] (0,0) rectangle ++(1.4,0.5);
-\fill[red!70!blue, fill opacity=0.1, rounded corners=3pt] (7.6,0) rectangle ++(1.45,0.5);
-\fill[red!70!blue, fill opacity=0.1, rounded corners=2pt] (9.55,0) rectangle ++(0.3,0.5);
-\end{tikzpicture}
-\end{textblock*}
-} %onslide2
+\[\vzt(\vx) = \sum_{\ve^{(j)} \in \mE} \hat{p}_z(\vzh = \ve^{(j)} | \vx) \, \ve^{(j)}\]
+}
 
-\only<3->{%
-\small
-\begin{textblock*}{10cm}(1.5cm,5.8cm)
-\[
-\vzt = \sum_j^k \hat{p}_c(c = j) \ \ve^{(j)}
-\qquad \hat{d}(\vx, \vxh) = d(\vx, \gDp[\mathrm{sg}(\vzh - \vzt) + \vzt])
-\]
-\end{textblock*}
-\begin{textblock*}{1cm}(1cm,5.8cm)
-\begin{flushleft}
-\structure{3)}
-\end{flushleft}
-\end{textblock*}
-\begin{textblock*}{1cm}(3.35cm,6.1cm)
-\begin{tikzpicture}
-\fill[red!70!blue, fill opacity=0.1, rounded corners=3pt] (4,0) rectangle ++(1.4,0.5);
-\fill[red!70!blue, fill opacity=0.1, rounded corners=3pt] (9.2,0) rectangle ++(2,0.5);
-\end{tikzpicture}
-\end{textblock*}
-} %onslide3
+% \alert{\[d(\rvx, \hat{\rvx}) = d(\rvx, \gDp[\mathrm{sg}(\vzh - \vzt) + \vzt])\]}
 
-\only<4->{%
-\begin{textblock*}{15cm}(-1cm,7.6cm)
-\[
-\argmin_{\gEt, \gQE, \gDp, \gPp} \ \frac{1}{n}\sum_i^n \hat{d}(\vx_i, \vxh_i) \, + \, \alpha \, s_{ce}(\vc_i) \, + \, \beta \, h_{ce}(\vc_i), \quad \vx_i \sim \mux
-\]
-\end{textblock*}
-\begin{textblock*}{10cm}(1.5cm,7.5cm)
-\begin{tikzpicture}
-\fill[red!70!blue, draw=red, fill opacity=0.2, rounded corners=10pt] (2,1.9) rectangle ++(10,1.3);
-\end{tikzpicture}
-\end{textblock*}
-} %onslide 4
 
 \end{frame}
 
+
 %%%%%%%%%%%%% Training solutions %%%%%%%%%%%%%%%
+
+\begin{frame}[t]
+
+\structure{\Large Solutions - i), ii), iii)}
+
+\vskip 0.3cm
+
+\structure{ii) pushforward measure}
+\vskip 0.2cm
+
+\center
+{\scriptsize
+$\mux$ - unkown \& fixed, \hspace{0.5cm} $\muc$ pushforward $f_{*}(\mux), f = \gQE \circ \gEt$ - unkown \& not fixed \\
+\alert{change $\gEt$ and $\gQE$ to change $\muc$ and hence rate $\Hc$}
+}
+
+\flushleft
+\structure{iii) soft cross-entropy}
+% \vskip 0.3cm
+
+{\scriptsize
+\[\cHc(\rvc) = - \E_{\muc} \log q_c(\rvc) = 
+- \int_\rvx \sum_j p_c(\rvc = j | \vx) \log q_c(\rvc = j)  \dd \mux\]
+
+\text{\alert{hard cross-entropy (no gradients to $\gEt$ and $\gQE$, no rate effect):}}
+\[\cHc(\rvc) = h(\rvc) \approx
+- \frac{1}{n} \sum_i^n \sum_j p_c(\rvc = j | \vx_i) \log q_c(\rvc = j), 
+\quad
+p_c(\rvc = j | \vx) = p_z(\vzh = \ve^{(j)} \vert \vx) \]
+
+
+\text{\alert{soft cross-entropy (gradients to $\gEt$ and $\gQE$, rate effect):}}
+\[\cHc(\rvc) = s(\rvc) \approx
+- \frac{1}{n} \sum_i^n \sum_j \hat{p}_c(\rvc = j | \vx_i) \log \mathrm{sg} q_c(\rvc = j), 
+\quad
+\hat{p}_c(\rvc = j | \vx) = \hat{p}_z(\vzh = \ve^{(j)} \vert \vx) \]
+}
+
+\begin{textblock*}{12cm}(0.5cm,8cm)
+\[\Ls(\gEt, \gDp, \gQE, \gPp) := \sum_i^n d(\rvx, \gDp[\mathrm{sg}(\vzh_i - \vzt_i) + \vzt_i]) + \alpha s(\vc_i) + \beta h(\vc_i)\]
+\end{textblock*}
+
+\begin{textblock*}{12cm}(1cm,8cm)
+\begin{tikzpicture}
+\fill[red!40!black, fill opacity=0.1, draw=red!40!black, rounded corners=5pt] (0,0) rectangle ++(11,1.1);
+\end{tikzpicture}
+\end{textblock*}
+
+\end{frame}
+
+
+%%%%%%%%%%%%% Proof of concept experiments %%%%%%%%%%%%%%%
 
 
 \begin{frame}[t]
@@ -630,7 +643,7 @@ $\gQE, \gEt \to \muc \to \Hc$
 \includegraphics[width=0.3\textwidth]{Pics/reconstruct_bpp.png}
 };
 \node[inner sep=0pt] at (0, 0) {%
-\includegraphics[width=\textwidth]{Pics/experiments.png}
+\includegraphics[width=\textwidth]{../paper/pics/experiments.png}
 };
 \node[inner sep=0pt] at (3, -3) {%
 \includegraphics[width=0.3\textwidth]{Pics/reconstruct_mse.png}
@@ -665,354 +678,291 @@ Imagenet32
 
 \end{frame}
 
-% %%%%%%%%%%%%% Working diagram %%%%%%%%%%%%%%%
+%%%%%%%%%%%%% Future work %%%%%%%%%%%%%%%
 
-% \begin{frame}[t]
 
-% \structure{\Large Transform coding with vector quantization}
+\begin{frame}[t]
 
-% \vskip 0.5cm
+\structure{\Large Future work ideas}
+
+\vskip 0.5cm
+
+\begin{enumerate}[i)]
+\item technical improvements
+\item instance specific dictionary
+\item squeeze more from entropy
+\item BB-ANS for VQVAE
+\item other random ideas
+\end{enumerate}
+
+
+\end{frame}
+
+%%%%%%%%%%%%% technical improvements %%%%%%%%%%%%%%%
+
+
+\begin{frame}[t]
+
+\structure{\Large i) Technical improvements}
+\vskip 0.5cm
+
+\emph{\structure{Better probability model:}}
+\vskip 0.3cm
+
+{\scriptsize
+Current $q_c(\vc) = \prod_i^d q_i(c_i), q_i = q_j \quad \Rightarrow \quad$ \alert{more complex model e.g. AR or IDF}
+\vskip 0.3cm
+
+Challenge: $q_c \approx p_c$ not fixed but evolving during training; training stability?
+}
+\vskip 0.5cm
+
+\emph{\structure{Backward gradient info:}}
+\vskip 0.3cm
+
+{\scriptsize
+soft relaxation vs streight-through vs. soft relaxation with anealing
+}
+\vskip 0.5cm
+
+\emph{\structure{Initialization of $\mE$:}}
+\vskip 0.3cm
+
+{\scriptsize
+random uniform vs k-means++
+}
+
+\end{frame}
+
+
+%%%%%%%%%%%%% Instance specific dictinoary %%%%%%%%%%%%%%%
+
+
+\begin{frame}[t]
+
+\structure{\Large ii) Instance specific dictionary}
+
+% \vskip 0.2cm
+
 
 % \begin{columns}
 % \column{\dimexpr\paperwidth-6pt}
-% \center
-% \small
-% \begin{tikzpicture}[scale=0.6]
-% \node[inner sep=0pt] (z) at (5.5, 4.9) {$\vz$};
-% \node[inner sep=0pt] (zhat) at (5.5, -1.6) {$\vzh$};
-% \node[inner sep=0pt] (c) at (14.1, 4.8) {$\vc$};
-% \node[inner sep=0pt] (chat) at (14.1, -0.2) {$\vc$};
-% \node[inner sep=0pt] (bits) at (16.5, 3.5) {$0010101101\ldots$};
-% \node[inner sep=0pt] (embed) at (10.5, 2.1) {$\mE$ - codebook};
+\center
+\small
+\begin{tikzpicture}[scale=0.6]
+\node[inner sep=0pt] (original) at (0,6.5)
+    {\includegraphics[width=0.12\textwidth]{Pics/cat.png}};
+\node[inner sep=0pt] (original) at (0,0)
+    {\includegraphics[width=0.12\textwidth]{Pics/cat_hat.png}};
 
-% \node[inner sep=0pt] (quant) at (10.5, 5.8) {$\gQE$};
-% \node[inner sep=0pt] (dquant) at (10.5, 0.7) {$\overline{\gQE}$};
+\node[inner sep=0pt] (x) at (0, 5) {$\vx$};
+\node[inner sep=0pt] (xhat) at (0, -1.5) {$\vxh$};
+\node[inner sep=0pt] (z) at (5.5, 4.9) {$\vz$};
+\node[inner sep=0pt] (z') at (13.2, 2.4) {\scriptsize $\vz'$};
+\node[inner sep=0pt] (zhat) at (5.5, -1.6) {$\vzh$};
+\node[inner sep=0pt] (embed) at (16, 2.1) {\scriptsize $\mE$ common codebook};
+\node[inner sep=0pt] (embed) at (10, 2.1) {\scriptsize $\mE | \vz'$ instance codebook};
 
-% {\scriptsize
-% \node[inner sep=0pt] (mz) at (4.5, 7.7) {$m$};
-% \node[inner sep=0pt] (me) at (8, 3.4) {$m$};
-% \node[inner sep=0pt] (mz) at (4.5, 1.2) {$m$};
-% }
+\node[inner sep=0pt] (quant) at (9.8, 5.6) {$\gQE$};
+% \node[inner sep=0pt] (quantt) at (10.5, 6.25) {quantizer};
+\node[inner sep=0pt] (enc) at (2.8, 7.2) {$\gEt$};
+\node[inner sep=0pt] (enct) at (2.8, 7.75) {encoder};
+\node[inner sep=0pt] (enc) at (11.3, 6.5) {$\gEt'$};
+\node[inner sep=0pt] (dec) at (2.8, 0.2) {$\gDp$};
+\node[inner sep=0pt] (enct) at (2.8, 0.8) {decoder};
+\node[inner sep=0pt] (dquant) at (9.8, 0.7) {$\overline{\gQE}$};
+\node[inner sep=0pt] (dec) at (12.4, 3.5) {\scriptsize 
+};
 
+\node[inner sep=0pt] (sender) at (0, 3.9) {sender};
+\node[inner sep=0pt] (sender) at (0, 2.9) {reciever};
+\draw[color = black, thick, dashed] (-1,3.3) to ++(9, 0);
 
-% \tikzcuboid{%
-% shiftx=5.3cm,%
-% shifty=6cm,%
-% scale=0.50,%
-% rotation=0,%
-% densityx=2,%
-% densityy=2,%
-% densityz=2,%
-% dimx=4,%
-% dimy=4,%
-% dimz=6,%
-% front/.style={draw=green!75!black,fill=green!30!white},%
-% right/.style={draw=green!50!white,fill=green!30!white},%
-% top/.style={draw=green!50!white,fill=green!30!white},%
-% % front/.style={draw=blue!75!black,fill=blue!25!white},%
-% % right/.style={draw=blue!25!black,fill=blue!75!white},%
-% % top/.style={draw=blue!50!black,fill=blue!50!white},%
-% anglex=0,%
-% angley=90,%
-% % anglez=221.5,%
+\tikzcuboid{%
+shiftx=5.3cm,%
+shifty=6cm,%
+scale=0.50,%
+rotation=0,%
+densityx=2,%
+densityy=2,%
+densityz=2,%
+dimx=4,%
+dimy=4,%
+dimz=6,%
+front/.style={draw=green!75!black,fill=green!30!white},%
+right/.style={draw=green!50!white,fill=green!30!white},%
+top/.style={draw=green!50!white,fill=green!30!white},%
+anglex=0,%
+angley=90,%
 % anglez=221.5,%
-% scalex=1,%
-% scaley=1,%
-% scalez=0.4,%
-% emphedge=true,%
-% emphstyle/.style={draw=black!50!green, thin},%
-% shade,%
-% shadeopacity=0.1,%
-% }
-% \tikzcuboid{%
-% shiftx=5.3cm,%
-% shifty=-0.5cm,%
-% front/.style={draw=blue!60!white,fill=blue!70!green!20!white},%
-% right/.style={draw=blue!20!white,fill=blue!70!green!20!white},%
-% top/.style={draw=blue!20!white,fill=blue!70!green!20!white},%
-% }
+anglez=221.5,%
+scalex=1,%
+scaley=1,%
+scalez=0.4,%
+emphedge=true,%
+emphstyle/.style={draw=black!50!green, thin},%
+shade,%
+shadeopacity=0.1,%
+}
+\tikzcuboid{%
+shiftx=5.3cm,%
+shifty=-0.5cm,%
+front/.style={draw=blue!60!white,fill=blue!70!green!20!white},%
+right/.style={draw=blue!20!white,fill=blue!70!green!20!white},%
+top/.style={draw=blue!20!white,fill=blue!70!green!20!white},%
+}
 
-% % embeddings
-% \draw[blue!25!white,xstep=0.2,ystep=0.2] (8.4,2.4) grid ++(4,2);
-% \fill[blue,fill opacity=0.2] (8.4,2.4) rectangle ++(4,2);
+% embeddings
+\draw[blue!40!yellow,xstep=0.2,ystep=0.2] (8.4,2.4) grid ++(3,2);
+\fill[blue!40!yellow,fill opacity=0.2] (8.4,2.4) rectangle ++(3,2);
 
-% % c
-% \draw[green!20!white,xstep=0.25,ystep=0.25] (13.2,5) grid ++(2,2);
-% \fill[blue!80!green,fill opacity=0.2] (13.2,5) rectangle ++(2,2);
+\draw[blue!25!white,xstep=0.2,ystep=0.2] (14.2,2.4) grid ++(3,2);
+\fill[blue,fill opacity=0.2] (14.2,2.4) rectangle ++(3,2);
 
-% % c
-% \draw[green!20!white,xstep=0.25,ystep=0.25] (13.2,0) grid ++(2,2);
-% \fill[blue!80!green,fill opacity=0.2] (13.2,0) rectangle ++(2,2);
+% small z
+\draw[green!75!black,xstep=0.2,ystep=0.2] (13.,2.8) grid ++(0.2,1.6);
+\fill[green,fill opacity=0.2]  (13.,2.8) rectangle ++(0.2,1.6);
 
+% arrows - encoder
+\draw[color = green!70!black, thick, ->] (1.5,6.5) arc[start angle = 120, end angle = 60, radius = 2.5];
+\draw[color = green!70!black, thick, ->] (7.5,6.5) arc[start angle = 105, end angle = 40, radius = 5.3];
 
-% % arrows - quantizer
-% \draw[color = green!60!blue, thick, ->] (7.6,6) arc[start angle = 100, end angle = 40, radius = 3];
-% \draw[color = green!30!blue, thick, dashed, ->] (10.6,5) arc[start angle = 140, end angle = 80, radius = 2.5];
+% arrows - quantizer
+\draw[color = green!60!blue, thick, ->] (7.6,6) arc[start angle = 100, end angle = 20, radius = 2];
 
-% % arrows - dequantizer
-% \draw[color = green!30!blue, thick, ->] (10.4,1.7) arc[start angle = -40, end angle = -100, radius = 3];
-% \draw[color = green!30!blue, thick, dashed, ->] (12.9,0.8) arc[start angle = -80, end angle = -140, radius = 2.5];
+% arrows - dequantizer
+\draw[color = green!30!blue, thick, ->] (9.8,1.8) arc[start angle = -20, end angle = -100, radius = 2];
 
-% % arrwos - lossless
-% \draw[color = black, thick, dotted, ->] (15.2,4.95) to ++(1.2, -0.7);
-% \draw[color = black, thick, dotted, <-] (15.2,2.05) to ++(1.2, 0.7);
+% arrows - decoder
+\draw[color = green!30!blue, thick, ->] (4,0) arc[start angle = -60, end angle = -120, radius = 2.5];
 
-% \fill[fill=blue!60!green, draw=blue!60!green] (14,6.8) rectangle ++(0.2,0.2);
-% \node[yellow, scale=.6, inner sep=0pt] (embed) at (14.1, 6.9) {7};
-% \node[blue!60!green, inner sep=0pt] (c) at (14.3, 7.3) {$c^{(4)}$};
-% \fill[fill=blue!60!green, draw=blue!60!green] (14,1.8) rectangle ++(0.2,0.2);
-% \node[yellow, scale=.6, inner sep=0pt] (embed) at (14.1, 1.9) {7};
-% \node[blue!60!green, inner sep=0pt] (chat) at (14.3, 2.3) {$c^{(4)}$};
+% arrrows C
+\draw[color = blue!40!yellow, thick, dotted, <-] (11.6,3.3) to ++(1.3, 0);
+\draw[color = blue!40!yellow, thick, dotted] (13.3,3.3) to ++(0.8, 0);
 
-% %e
-% \fill[fill=blue!60!green, draw=blue!60!green] (9.62,2.4) rectangle ++(0.15,2);
-% \node[blue!60!green, inner sep=0pt] (z4) at (9.9, 4.7) {$e^{(7)}$};
-% % z4
-% \fill[blue!20!green] (5.18,6.98) rectangle ++(0.2,0.2);
-% \draw[fill=blue!20!green, draw=blue!20!green] (5.2,7.2) -- (6,8) -- (6.2,8) -- (5.4,7.2) -- cycle;
-% \node[blue!20!green, inner sep=0pt] (z4) at (6.3, 8.3) {$z^{(4)}$};
-% % z4hat
-% \fill[blue!60!green] (5.18,0.48) rectangle ++(0.2,0.2);
-% \draw[fill=blue!60!green, draw=blue!60!green] (5.2,0.7) -- (6,1.5) -- (6.2,1.5) -- (5.4,0.7) -- cycle;
-% \node[blue!60!green, inner sep=0pt] (z4) at (6.3, 1.8) {$\hat{z}^{(4)}$};
-
-% \node[inner sep=0pt] (quant) at (10.5, 6.5) {$\Vert z^{(i)} - e^{(j)}\Vert$};
-
-
-
-% \end{tikzpicture}
+\end{tikzpicture}
 % \end{columns}
 
+\flushleft
+{\scriptsize
+Idea: $\mE \vert \vz'$ better for specific instance $\vx$ then generic $\mE$
 
-% \end{frame}
+transmitt: $\vc, \vz' \quad \rightarrow \quad$ trade-off size of $\vz'$ vs $\mE$
 
+$\gC_{\xi}(\vz', \mE) = \mE | \vz'$: architecture so that not ignoring $\vz'$, 
+complex vs constrained transformation (e.g. completely free vs only shuffle columns to improve entropy)
+}
 
-% %%%%%%%%%%%%% Working diagram 2 %%%%%%%%%%%%%%%
+\end{frame}
 
-% \begin{frame}[t]
+%%%%%%%%%%%% entropy %%%%%%%%%%%%%%%
 
-% \structure{\Large Transform coding with vector quantization}
+\begin{frame}[t]
 
-% \vskip 0.5cm
+\structure{\Large iii) Squeeze more from entropy}
 
-% \begin{columns}
-% \column{\dimexpr\paperwidth-6pt}
-% \center
-% \small
-% \begin{tikzpicture}[scale=0.6]
+\vskip 1cm
 
-% \node[inner sep=0pt] (z) at (5.5, 4.9) {$\vz$};
-% \node[inner sep=0pt] (zhat) at (5.5, -1.6) {$\vzh$};
-% \node[inner sep=0pt] (c) at (14.1, 4.75) {$\vc$};
-% \node[inner sep=0pt] (chat) at (14.1, -0.6) {$\vc$};
-% \node[inner sep=0pt] (bits) at (16.5, 3.5) {$0010101101\ldots$};
-% \node[inner sep=0pt] (embed) at (10.5, 2.8) {$\mE$ - codebook};
+\center
 
-% \node[inner sep=0pt] (quant) at (10.5, 5.8) {$\gQE$};
-% \node[inner sep=0pt] (dquant) at (10.5, 0.7) {$\overline{\gQE}$};
+link to MAP, ELBO (VAE), more info theory?
 
-% {\scriptsize
-% \node[inner sep=0pt] (mz) at (4.5, 7.7) {$m$};
-% \node[inner sep=0pt] (mz) at (4.5, 1.2) {$m$};
-% \node[inner sep=0pt] (me) at (13.3, 7) {$m$};
-% \node[inner sep=0pt] (me) at (13.3, 1.7) {$m$};
-% }
+\vskip 0.5cm
+
+\includegraphics[width=0.4\textwidth]{Pics/thoughts}
 
 
-% \tikzcuboid{%
-% shiftx=5.3cm,%
-% shifty=6cm,%
-% scale=0.50,%
-% rotation=0,%
-% densityx=2,%
-% densityy=2,%
-% densityz=2,%
-% dimx=4,%
-% dimy=4,%
-% dimz=6,%
-% front/.style={draw=green!75!black,fill=green!30!white},%
-% right/.style={draw=green!50!white,fill=green!30!white},%
-% top/.style={draw=green!50!white,fill=green!30!white},%
-% anglex=0,%
-% angley=90,%
-% % anglez=221.5,%
-% anglez=221.5,%
-% scalex=1,%
-% scaley=1,%
-% scalez=0.4,%
-% emphedge=true,%
-% emphstyle/.style={draw=black!50!green, thin},%
-% shade,%
-% shadeopacity=0.1,%
-% }
-% \tikzcuboid{%
-% shiftx=5.3cm,%
-% shifty=-0.5cm,%
-% front/.style={draw=blue!60!white,fill=blue!70!green!20!white},%
-% right/.style={draw=blue!20!white,fill=blue!70!green!20!white},%
-% top/.style={draw=blue!20!white,fill=blue!70!green!20!white},%
-% }
-
-% % embeddings
-% \draw[blue!25!white,xstep=0.2,ystep=0.2] (8.4,3.6) grid ++(4,0.2);
-% \fill[blue,fill opacity=0.2] (8.4,3.6) rectangle ++(4,0.2);
-
-% % c
-% \tikzcuboid{%
-% shiftx=13.9cm,%
-% shifty=5.6cm,%
-% scale=.4,
-% front/.style={draw=blue!60!green!40!white,fill=blue!70!green!20!white},%
-% right/.style={draw=blue!60!green!10!white,fill=blue!70!green!20!white},%
-% top/.style={draw=blue!60!green!10!white,fill=blue!70!green!20!white},%
-% emphedge=false,%
-% }
-
-
-% % c
-% \tikzcuboid{%
-% shiftx=13.9cm,%
-% shifty=0.3cm,%
-% scale=.4,
-% front/.style={draw=blue!60!green!40!white,fill=blue!70!green!20!white},%
-% right/.style={draw=blue!60!green!10!white,fill=blue!70!green!20!white},%
-% top/.style={draw=blue!60!green!10!white,fill=blue!70!green!20!white},%
-% emphedge=false,%
-% }
-
-% % arrows - quantizer
-% \draw[color = green!60!blue, thick, ->] (7.6,6) arc[start angle = 100, end angle = 40, radius = 3];
-% \draw[color = green!30!blue, thick, dashed, ->] (10.6,5) arc[start angle = 140, end angle = 80, radius = 2.5];
-
-% % arrows - dequantizer
-% \draw[color = green!30!blue, thick, ->] (10.4,1.7) arc[start angle = -40, end angle = -100, radius = 3];
-% \draw[color = green!30!blue, thick, dashed, ->] (12.9,0.8) arc[start angle = -80, end angle = -140, radius = 2.5];
-
-% % arrwos - lossless
-% \draw[color = black, thick, dotted, ->] (15.2,4.95) to ++(1.2, -0.7);
-% \draw[color = black, thick, dotted, <-] (15.2,2.05) to ++(1.2, 0.7);
-
-% \fill[fill=blue!60!green, draw=blue!60!green] (13.8,6.4) rectangle ++(0.15,0.15);
-% \node[yellow, scale=.6, inner sep=0pt] (embed) at (13.9,6.5) {7};
-% \node[blue!60!green, inner sep=0pt] (c) at (14.3, 6.85) {$c^{(4)}$};
-% \fill[fill=blue!60!green, draw=blue!60!green] (13.8,1.1) rectangle ++(0.15,0.15);
-% \node[yellow, scale=.6, inner sep=0pt] (embed) at (13.9, 1.2) {7};
-% \node[blue!60!green, inner sep=0pt] (chat) at (14.3, 1.55) {$c^{(4)}$};
-
-% %e
-% \fill[fill=blue!60!green, draw=blue!60!green] (9.62,3.6) rectangle ++(0.15,0.2);
-% \node[blue!60!green, inner sep=0pt] (z4) at (9.9, 4.3) {$e^{(7)}$};
-% % z4
-% \fill[blue!20!green] (5.18,6.98) rectangle ++(0.2,0.2);
-% \node[green!20!black, inner sep=0pt] (z4) at (5.7, 7.5) {$z^{(4)}$};
-% % z4hat
-% \fill[blue!60!green] (5.18,0.48) rectangle ++(0.2,0.2);
-% \node[blue, inner sep=0pt] (z4) at (5.7, 1) {$\hat{z}^{(4)}$};
-
-% \node[inner sep=0pt] (quant) at (10.5, 6.5) {$\Vert z^{(i)} - e^{(j)}\Vert$};
-
-% \end{tikzpicture}
-% \end{columns}
-
-
-% \end{frame}
-
-
-% % %%%%%%%%%%%%% Working Diagram 3 %%%%%%%%%%%%%%%
-
-% \begin{frame}[t]
-
-% \structure{\Large Transform coding with vector quantization}
-
-% \vskip 0.5cm
-
-% \begin{columns}
-% \column{\dimexpr\paperwidth-6pt}
-% \center
-% \small
-% \begin{tikzpicture}[scale=0.6]
-% \node[inner sep=0pt] (original) at (0,6.5)
-%     {\includegraphics[width=0.12\textwidth]{Pics/cat.png}};
-% \node[inner sep=0pt] (original) at (0,0)
-%     {\includegraphics[width=0.12\textwidth]{Pics/cat_hat.png}};
-
-% \node[inner sep=0pt] (x) at (0, 5) {$\vx$};
-% \node[inner sep=0pt] (xhat) at (0, -1.5) {$\vxh$};
-% \node[inner sep=0pt] (z) at (5.5, 4.9) {$\vz$};
-% \node[inner sep=0pt] (zhat) at (5.5, -1.6) {$\vzh$};
-% \node[inner sep=0pt] (embed) at (10.5, 2.1) {$\mE$ - codebook};
-
-% \node[inner sep=0pt] (quant) at (7.7, 3.5) {$\gQE$};
-% \node[inner sep=0pt] (enc) at (2.8, 7.2) {$\gEt$};
-% \node[inner sep=0pt] (dec) at (2.8, 0.2) {$\gDp$};
-% \node[inner sep=0pt] (prob) at (7.7, -0.8) {$\gPp$};
-
-
-% \tikzcuboid{%
-% shiftx=5.3cm,%
-% shifty=6cm,%
-% scale=0.50,%
-% rotation=0,%
-% densityx=2,%
-% densityy=2,%
-% densityz=2,%
-% dimx=4,%
-% dimy=4,%
-% dimz=6,%
-% front/.style={draw=green!75!black,fill=green!30!white},%
-% right/.style={draw=green!50!white,fill=green!30!white},%
-% top/.style={draw=green!50!white,fill=green!30!white},%
-% % front/.style={draw=blue!75!black,fill=blue!25!white},%
-% % right/.style={draw=blue!25!black,fill=blue!75!white},%
-% % top/.style={draw=blue!50!black,fill=blue!50!white},%
-% anglex=0,%
-% angley=90,%
-% % anglez=221.5,%
-% anglez=221.5,%
-% scalex=1,%
-% scaley=1,%
-% scalez=0.4,%
-% emphedge=true,%
-% emphstyle/.style={draw=black!50!green, thin},%
-% shade,%
-% shadeopacity=0.1,%
-% }
-% \tikzcuboid{%
-% shiftx=5.3cm,%
-% shifty=-0.5cm,%
-% front/.style={draw=blue!60!white,fill=blue!70!green!20!white},%
-% right/.style={draw=blue!20!white,fill=blue!70!green!20!white},%
-% top/.style={draw=blue!20!white,fill=blue!70!green!20!white},%
-% }
-
-% % embeddings
-% \draw[blue!25!white,xstep=0.2,ystep=0.2] (8.4,2.4) grid ++(4,2);
-% \fill[blue,fill opacity=0.2] (8.4,2.4) rectangle ++(4,2);
+\end{frame}
 
 
 
-% % arrows - encoder
-% \draw[color = green!70!black, thick, ->] (1.5,6.5) arc[start angle = 120, end angle = 60, radius = 2.5];
+%%%%%%%%%%%% BB-ANS for VQVAE %%%%%%%%%%%%%%%
 
-% % arrows - quantizer
-% \draw[color = green!60!blue, thick, ->] (7.6,6) arc[start angle = 100, end angle = 40, radius = 3];
+\begin{frame}[t]
 
-% % arrows - dequantizer
-% \draw[color = green!30!blue, thick, ->] (10.4,1.7) arc[start angle = -40, end angle = -100, radius = 3];
+\structure{\Large iv) BB-ANS for VQVAE}
 
-% % arrows - decoder
-% \draw[color = green!30!blue, thick, ->] (4,0) arc[start angle = -60, end angle = -120, radius = 2.5];
+\vskip 0.2cm
+
+{\scriptsize
+\structure{Townsend (2019) BB-ANS}: efficient lossless compression using VAE 
+
+\center
+\alert{open question - need to discretize latent $z$ before encoding via ANS}
+
+\flushleft
+\structure{van den Oord (2017) VQVAE}: learned discretization via vector quantization
+\[p(\vx) = \sum_{\vc} p(\vx | \vc) p(\vc), \qquad \vc \in \{0, 1, \ldots, K\}\]
+\vskip -0.2cm
+\[\text{deterministic: } \quad
+q(\vc = k \vert \vx) = \begin{cases}
+1 & \text{if} \ k = \argmin_{i} \Vert \vz(\vx) - \ve^{(i)}\Vert_2^2 \\
+0 & \text{otherwise}
+\end{cases}
+\]
+$\Rightarrow \quad \KL(q(\vc = k \vert \vx) \Vert p(c)) = \log K \quad \Rightarrow$ can be dropped from loss
+\vskip 0.1cm
+
+streight-through to backprob to $\vz \quad \Rightarrow$ needs k-means loss for $\mE$ updates
+% \vskip 0.1cm
+
+\center
+\alert{fully deterministic scheme not amenable to BB}
+\vskip 0.1cm
+
+\flushleft
+\emph{\structure{Proposed method:}}
+\vskip -0.3cm
+\[\text{stochastic: } \quad q(\vc = k \vert \vx) = \frac{\exp(\Vert \vz(\vx) - \ve^{(k)}\Vert_2^2)}{\sum_i^K \exp(\Vert \vz(\vx) - \ve^{(i)}\Vert_2^2)}\]
+\[c\ \sim \quad q(\vc = k \vert \vx) \quad \text{Gumbel soft-max etc.} \quad \KL(q(\vc = k \vert \vx) \Vert p(c)) = - \sH_{q(\vc | \vx)} + \log K\]
+\centering
+\alert{stochastic amenable to BB, What does it bring compared to conti latent? 
+\vskip -0.4cm
+\[\text{note: } \quad \min - \sH_{q(\vc | \vx)} \quad \text{good for BB}\]
+}
+}
+
+\end{frame}
 
 
+%%%%%%%%%%%% Other random ideas %%%%%%%%%%%%%%%
 
+\begin{frame}[t]
 
+\structure{\Large v) Other random ideas}
 
+\vskip 0.5cm
 
-% \end{tikzpicture}
-% \end{columns}
+\emph{\structure{Side info:}}
+\vskip 0.1cm
 
+{\scriptsize
+Use side info (e.g. ABB meta-data to generate data and compress only the differences
 
-% \end{frame}
+\alert{$\Rightarrow \quad$ major patterns covered by generations, compress only the irregularities (surprises)}
+}
+\vskip 0.3cm
+
+\emph{\structure{Variable representation power:}}
+\vskip 0.1cm
+
+{\scriptsize
+sender has acces to full model so can evaluate the transmission error $\rightarrow$ if too big, compress less and vice versa
+
+\alert{$\Rightarrow \quad$ train multiple models (hierarchical, composable) with different rates and apply these selectively to different instances (e.g driven by $||\vz_i - \gQ(\vz_i)||$)}
+}
+\vskip 0.3cm
+
+\emph{\structure{Autoregressive dictionary:}}
+\vskip 0.1cm
+
+{\scriptsize
+current quantizer $\gQ$ uses single $\mE$ for quantizing all latent vectors $\vz$
+
+\alert{$\Rightarrow \quad$ learn $\mE^{(1)}$ to be used for $\vz^{(1)}$ and $f : (\mE^{(i)}, \gQ(\vz^{(i)}) \to \mE^{(i+1)}$ to be used for $\vz^{(i)}$}
+}
+
+\end{frame}
 
 
 %%%%%%%%%%%% References %%%%%%%%%%%%%%%
@@ -1049,6 +999,10 @@ van den Oord, A., Vinyals, O. \& Kavukcuoglu, K. (2017). \emph{``Neural Discrete
 
 \vspace{0.5em}
 Williams, W., Ringer, S., Ash, T., Hughes, J., MacLeod, D. \& Dougherty, J. (2020). \emph{``Hierarchical Quantized Autoencoders.''} NeurIPS.
+
+\vspace{0.5em}
+Townsend, J., Bird, T. \& Barber, D. (2019) \emph{``Practical Lossless Compression with Latent Variables using Bits Back Coding''} ICLR.
+
 
 \end{frame}
 
